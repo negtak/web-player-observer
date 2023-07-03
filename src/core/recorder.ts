@@ -7,6 +7,7 @@ export class Recorder {
     public previous_pause_time: number = 0;
     public total_pausing_time: number = 0;
     public total_dropped_frame: number = 0;
+    public current_time: number = 0;
     public height: string = '';
     public width: string = '';
     public video_display_area_height: string = '';

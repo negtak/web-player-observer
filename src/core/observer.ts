@@ -49,6 +49,7 @@ export class Observer {
             const video_playback_quality = this._media.getVideoPlaybackQuality();
             const total_dropped_frame = video_playback_quality.droppedVideoFrames;
             this._recorder.total_dropped_frame = total_dropped_frame;
+            this._recorder.current_time = this._media.currentTime;
             // get quality statistics
             this._recorder.height = this._media.videoHeight.toString();
             this._recorder.width = this._media.videoWidth.toString();
@@ -76,6 +77,7 @@ export class Observer {
     getStats () {
         return {
             'state': this._recorder.state,
+            'current_time': this._recorder.current_time,
             'total_join_time': this._recorder.total_join_time,
             'total_play_time': this._recorder.total_play_time,
             'total_pausing_time': this._recorder.total_pausing_time,
