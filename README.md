@@ -1,6 +1,14 @@
 # Observe Tools for HLS player
 
-### stats
+## usage
+
+```js
+const hlsJsObserver = new HlsJsObserver(hls, video);
+hlsJsObserver.enable();
+hlsJsObserver.getStats()
+```
+
+## stats property
 
 - user_agent
 - referrer
