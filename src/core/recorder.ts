@@ -1,5 +1,9 @@
 export class Recorder {
     private join_t0: number = 0;
+    public user_agent = window.navigator.userAgent;
+    public referrer = document.referrer;
+    public visibility = '';
+    public duration = 0;
     public total_join_time: number = 0;
     public play_t0 = 0;
     public previous_playing_time: number = 0;
@@ -16,6 +20,7 @@ export class Recorder {
     public bitrate: number = 0;
     public latency: number = 0;
     public mode: string = '';
+    public volume: number = 0;
     public state: string = 'ready';
 
     constructor (mode?: string) {

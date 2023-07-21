@@ -1,40 +1,36 @@
-import { Recorder } from "./recorder";
-import { PlayerEvents } from "./types";
-
+import { Recorder } from './recorder';
 export class Observer {
     protected _options: any;
     protected _recorder: Recorder;
     protected _media: HTMLVideoElement;
     protected _is_live: boolean;
-    protected _error: { [key: string]: number; };
 
     constructor(media: HTMLVideoElement, options?: any) {
         this._options = options
         this._media = media;
         this._is_live = false;
-        this._error = {};
         this._recorder = new Recorder(this._options?.mode);
     }
 
-    protected _record(event: PlayerEvents) {
+    protected _record(event: String) {
         return  ()  => {
             switch (event) {
-                case PlayerEvents.LOAD_START:
+                case 'loadstart':
                     this._recorder.join_start();
                     break;
-                case PlayerEvents.CAN_PLAY:
+                case 'canplay':
                     this._recorder.join_end();
                     break;
-                case PlayerEvents.PLAYING:
+                case 'playing':
                     this._recorder.state = 'playing';
                     if (this._recorder.play_t0 == 0) {
                         this._recorder.play_t0 = performance.now();
                     }
                     break;
-                case PlayerEvents.PAUSE:
+                case 'pause':
                     this._recorder.state = 'pause';
                     break;
-                case PlayerEvents.ENDED:
+                case 'ended':
                     this._recorder.state = 'ended';
                     break;
                 default:
@@ -56,41 +52,27 @@ export class Observer {
             // get page element info
             this._recorder.video_display_area_height = this._media.height.toString();
             this._recorder.video_display_area_width = this._media.width.toString();
+            // get meta info
+            this._recorder.volume = this._media.volume;
+            this._recorder.visibility = document.visibilityState;
+            this._recorder.duration = this._is_live ? this._media.duration : 0;
+            // set player state
             this._recorder.record_play();
             this._recorder.record_pause();
         }, 10000);
     }
 
     addListener () {
-        this._media.addEventListener('loadstart', this._record(PlayerEvents.LOAD_START));
-        this._media.addEventListener('canplay', this._record(PlayerEvents.CAN_PLAY));
-        this._media.addEventListener('pause', this._record(PlayerEvents.PAUSE));
-        this._media.addEventListener('ended', this._record(PlayerEvents.ENDED));
-        this._media.addEventListener('playing', this._record(PlayerEvents.PLAYING));
+        this._media.addEventListener('loadstart', this._record('loadstart'));
+        this._media.addEventListener('canplay', this._record('canplay'));
+        this._media.addEventListener('pause', this._record('pause'));
+        this._media.addEventListener('ended', this._record('ended'));
+        this._media.addEventListener('playing', this._record('playing'));
         this.setStats();
     }
 
     removeListener () {
-        console.log("Observe Process stop ...")
-    }
-
-    getStats () {
-        return {
-            'state': this._recorder.state,
-            'current_time': this._recorder.current_time,
-            'total_join_time': this._recorder.total_join_time,
-            'total_play_time': this._recorder.total_play_time,
-            'total_pausing_time': this._recorder.total_pausing_time,
-            'current_bitrate': this._recorder.state == 'playing' ? this._recorder.bitrate : 0,
-            'total_dropped_frame': this._recorder.total_dropped_frame,
-            'video_height': this._recorder.height,
-            'video_width': this._recorder.width,
-            'video_display_area_height': this._recorder.video_display_area_height,
-            'video_display_area_width': this._recorder.video_display_area_width,
-            'latency': this._recorder.state == 'playing' ? this._recorder.latency : 0,
-            'src_media': this._recorder.src_media,
-            'error': this._error,
-        }
+        console.log('Observe Process stop ...')
     }
 }
 
