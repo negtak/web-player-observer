@@ -7,12 +7,16 @@ export class HlsJsObserver extends Observer {
 
     private _error: { [key: string]: number; };
     private _total_duration: number;
+    private _buffer_ran_out_count: number;
+    private _buffered_count: number;
 
     constructor(player: Hls, media: HTMLVideoElement, options?: any) {
         super(media, options);
         this._player = player;
         this._error = {};
         this._total_duration = 0;
+        this._buffer_ran_out_count = 0;
+        this._buffered_count = 0;
     }
 
     enable () {
@@ -37,7 +41,13 @@ export class HlsJsObserver extends Observer {
                 }
             }
         });
+        this._player.on(Hls.Events.FRAG_BUFFERED, (_event, data) => {
+            this._buffered_count+=1;
+        })
         this._player.on(Hls.Events.ERROR, (_event, data) => {
+            if (Hls.ErrorDetails.BUFFER_STALLED_ERROR === data.details) {
+                this._buffer_ran_out_count+=1;
+            }
             this._error[data.details] = this._error[data.details] ?? 0 + 1;
         })
     }
@@ -70,6 +80,8 @@ export class HlsJsObserver extends Observer {
             'is_live': this._is_live,
             'error': this._error,
             'total_duration': this._total_duration,
+            'buffer_ran_out_count': this._buffer_ran_out_count,
+            'buffered_count': this._buffered_count
         }
     }
 }
